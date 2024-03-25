@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "central-ingress.name" . }}-internal
@@ -17,12 +17,18 @@ spec:
     - host: {{ .hostname }}
       http:
         paths:
-          - path: /*
+          - pathType: Prefix
+            path: /
             backend:
-              serviceName: redirect
-              servicePort: use-annotation
-          - path: /*
+              service:
+                name: redirect
+                port:
+                  name: use-annotation
+          - pathType: Prefix
+            path: /
             backend:
-              serviceName: {{ .serviceName }}
-              servicePort: {{ .port }}
+              service:
+                name: {{ .serviceName }}
+                port:
+                  number: {{ .port }}
   {{- end }}
